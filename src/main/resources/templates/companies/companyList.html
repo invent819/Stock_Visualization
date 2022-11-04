@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<style>
+table{
+text-align:center;
+margin: auto;
+}</style>
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div>
+    <table class="table">
+        <thead>
+        <tr>
+<!--
+    Long id;
+    String stock_name;
+    String corpcode;
+    int bsns_year;
+    String account_nm; // 계정명	ex) 자본총계
+    String fs_div; // 개별/연결구분
+    int thstrm_amount; // 당기금액
+    int frmtrm_amount; // 전기금액
+    String induty_code; // 산업코드
+    -->
+            <th>ID</th>
+            <th>기업명</th>
+            <th>기업코드</th>
+            <th>자본총계</th>
+            <th>당기금액</th>
+            <th>전기금액</th>
+            <th>산업코드</th>
+        </tr>
+        </thead>
+        <tbody>
+            <tr th:each="company : ${companies}">
+                <td th:text="${company.id}">아이디</td>
+                <td th:text="${company.stock_name}">기업명</td>
+                <td th:text="${company.corpcode}">기업코드</td>
+                <td th:text="${company.account_nm}">자본총계</td>
+                <td th:text="${company.thstrm_amount}">당기금액</td>
+                <td th:text="${company.frmtrm_amount}">전기금액</td>
+                <td th:text="${company.induty_code}">산업코드</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>
