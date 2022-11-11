@@ -10,6 +10,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -17,35 +18,34 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 import stock.stockvisualization.domain.company.Company;
+import stock.stockvisualization.domain.company.CompanyRepository;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
 
 @Service
 @Data
 @Slf4j
 public class SeleniumService {
-
+// stock_name, corpcode, bsns_year, account_nm, fs_div, sj_nm, thstrm_amount, frmtrm_amount, induty_code
     private  WebDriver driver;
     private final String API_KEY = "12ed28c5a1ccad901a74e01b506d6690588f73f5";
     private final String COMPANY_INFO_URL = "https://opendart.fss.or.kr/api/company.json";
     private final String FINANCIAL_URL = "https://opendart.fss.or.kr/api/fnlttSinglAcnt.json";
-
+    @Autowired
+    private CompanyRepository companyRepository;
     //전체 회사 목록
     public static HashMap<String, Company> companies = new HashMap<>();
 
-    public SeleniumService(){
-
+    public SeleniumService(CompanyRepository companyRepository){
+        this.companyRepository = companyRepository;
     }
     // 수정수정 필요
-    public void setAllCompany() throws ParserConfigurationException, IOException, SAXException, ParseException {
+/*    public void setAllCompany() throws ParserConfigurationException, IOException, SAXException, ParseException {
         String corp_code = xmlFindCode();
         Company company = companies.get(corp_code);
         findCompanyInfo(company,corp_code);
@@ -57,10 +57,10 @@ public class SeleniumService {
         findCompanyInfo(company,corp_code);
         findFinancialInfo(company, corp_code, bsns_year, reprt_code);
         return company;
-    }
-    public void findCompanyInfo(Company company, String corp_code) throws ParseException {
+    }*/
+    public boolean findCompanyInfo(Company company, String corp_code) throws ParseException {
         ChromeOptions options = new ChromeOptions();
-//        options.addArguments("--headless");
+        options.addArguments("--headless");
         driver = new ChromeDriver(options);
         driver.get(COMPANY_INFO_URL
                 +"?crtfc_key=" + API_KEY
@@ -76,7 +76,7 @@ public class SeleniumService {
         if(status.equals("013"))
         {
             System.out.println("데이터 없음");
-            return;
+            return false;
         }
         //extract company_info
         String corp_name = jsonObject.get("corp_name").toString();
@@ -88,6 +88,7 @@ public class SeleniumService {
 
         company.setStock_name(stock_name);
         company.setInduty_code(induty_code);
+        return true;
     }
 
     /*  reprt_code
@@ -97,9 +98,9 @@ public class SeleniumService {
         사업보고서 : 11011
      */
 
-    public void findFinancialInfo(Company company, String corp_code, String bsns_year, String reprt_code) throws ParseException {
+    public boolean findFinancialInfo(Company company, String corp_code, String bsns_year, String reprt_code) throws ParseException {
         ChromeOptions options = new ChromeOptions();
-//        options.addArguments("--headless");
+        options.addArguments("--headless");
         driver = new ChromeDriver(options);
         driver.get(FINANCIAL_URL
                 +"?crtfc_key=" + API_KEY
@@ -119,7 +120,7 @@ public class SeleniumService {
         if(status.equals("013"))
         {
             System.out.println("데이터 없음");
-            return;
+            return false;
         }
         //extract list
         JSONArray list = (JSONArray) jsonObject.get("list");
@@ -144,6 +145,7 @@ public class SeleniumService {
         for (int i=0; i < list.size(); i++) {
             company.setCorpcode(((JSONObject)list.get(i)).get("corp_code").toString());
             company.setBsns_year(Integer.parseInt(((JSONObject)list.get(i)).get("bsns_year").toString()));
+            company.setSj_nm(((JSONObject)list.get(i)).get("sj_nm").toString());
             company.setAccount_nm(((JSONObject)list.get(i)).get("account_nm").toString());
             company.setFs_div(((JSONObject)list.get(i)).get("fs_div").toString());
 
@@ -155,7 +157,7 @@ public class SeleniumService {
             log.info("company {}", company);
         }
 
-
+        return true;
     }
     //
 
@@ -164,7 +166,7 @@ public class SeleniumService {
 
 
     //파라미터 없음
-    public String xmlFindCode(){
+    public String saveCrawlingData(){
         // xml 파싱 빌드업
         Long id = 1l;
         try {
@@ -177,7 +179,9 @@ public class SeleniumService {
             NodeList nList = document.getElementsByTagName("list");
 //            log.info("nList = " + nList.getLength());
 //            System.out.println("----------------------------");
-            for (int temp = 0; temp < nList.getLength(); temp++) {
+            for (int temp = 100; temp < nList.getLength(); temp++) {
+                //log.info("temp = {}", temp);
+
                 Node nNode = nList.item(temp);
                 if (nNode.getNodeType() == Node.ELEMENT_NODE) {
                     Element eElement = (Element) nNode;
@@ -188,12 +192,25 @@ public class SeleniumService {
 //                    log.info("modify_date : " + eElement.getElementsByTagName("modify_date").item(0).getTextContent());
 
 
-                    //company Hash Add
-                    companies.put(corp_code ,new Company(id++, corp_name, corp_code));
+                            Company company = new Company(id++, corp_name, corp_code);
+                            //company Hash Add
 
+                    boolean errorCheck = findFinancialInfo(company, corp_code, "2022", "11013");
+                    if (errorCheck) {
+                        findCompanyInfo(company, corp_code);
+                        companyRepository.save(company);
+                    }
 
+                            //companies.put(corp_code, company);
                 }
+                System.out.println(temp);
             }
+/*
+            for (Company company : companies.values()) {
+                if(company.getAccount_nm()!= null){
+                    log.info("company = {}", company);
+                }
+            }*/
         }
         catch(IOException e) {
             log.info("errors = {}",e);
@@ -201,10 +218,12 @@ public class SeleniumService {
             throw new RuntimeException(e);
         } catch (SAXException e) {
             throw new RuntimeException(e);
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
         }
         return null;
     }
-    public String xmlFindCode(String find_corp_name) throws ParserConfigurationException, IOException, SAXException {
+  /*  public String xmlFindCode(String find_corp_name) throws ParserConfigurationException, IOException, SAXException {
         // xml 파싱 빌드업
         Long id = 1l;
         try {
@@ -241,7 +260,7 @@ public class SeleniumService {
         log.info("errors = {}",e);
     }
     return null;
-}
+}*/
 //
 //    public void process() {
 //

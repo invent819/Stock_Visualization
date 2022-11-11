@@ -36,6 +36,7 @@ margin: auto;
         </thead>
         <tbody>
             <tr th:each="company : ${companies}">
+                
                 <td th:text="${company.id}">아이디</td>
                 <td th:text="${company.stock_name}">기업명</td>
                 <td th:text="${company.corpcode}">기업코드</td>
