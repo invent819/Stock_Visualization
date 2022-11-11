@@ -7,7 +7,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.xml.sax.SAXException;
-import stock.stockvisualization.domain.company.Company;
 import stock.stockvisualization.domain.member.Member;
 import stock.stockvisualization.domain.member.MemberRepository;
 import stock.stockvisualization.web.SessionConst;
@@ -71,9 +70,9 @@ public class SeleniumController {
         member1.setCompanies(new ArrayList<>());
         memberRepository.save(member1);
 
+        seleniumTest.saveCrawlingData();
 
-
-        Company find_company = seleniumTest.setCompany("삼성전자", "2022", "11013");
+        //Company find_company = seleniumTest.setCompany("삼성전자", "2022", "11013");
 
 //        Company find_company = seleniumTest.setCompany("삼성전자", "2022", "11013");
 

@@ -42,7 +42,8 @@ public class CompanyController {
     public String Companies(Model model) throws ParserConfigurationException, IOException, ParseException, SAXException {
         // 전체 회사를 가져오는게 아님.
         // 전체 가져오려면 SeleniumService.xmlFindCode() 파라미터 조건없이 가져오도록 수정해야함
-        seleniumService.setAllCompany();
+        //seleniumService.setAllCompany();
+        seleniumService.saveCrawlingData();
         HashMap<String, Company> companies = SeleniumService.companies;
         model.addAttribute("companies", companies.values());
         return "companies/companyList";

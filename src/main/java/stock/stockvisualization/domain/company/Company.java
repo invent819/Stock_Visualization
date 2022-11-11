@@ -44,6 +44,7 @@ public class Company {
     int bsns_year;
     String account_nm; // 계정명	ex) 자본총계
     String fs_div; // 개별/연결구분
+    String sj_nm;
     int thstrm_amount; // 당기금액
     int frmtrm_amount; // 전기금액
     String induty_code; // 산업코드
