@@ -134,21 +134,13 @@ public class SeleniumService {
             try {
                 String corpcode = document.select("list").get(i).select("corp_code").text();
 
-                System.out.println("1");
                 String account_nm = document.select("list").get(i).select("account_nm").text();
-                System.out.println("2");
                 String fs_div = document.select("list").get(i).select("fs_div").text();
-                System.out.println("3");
                 String sj_nm = document.select("list").get(i).select("sj_nm").text();
-                System.out.println("4");
                 String thstrm_amount = document.select("list").get(i).select("thstrm_amount").text().replace(",", "");
-                System.out.println("5");
                 String thstrm_add_amount = document.select("list").get(i).select("thstrm_add_amount").text().replace(",", "");
-                System.out.println("6");
                 String frmtrm_amount = document.select("list").get(i).select("frmtrm_amount").text().replace(",", "");
-                System.out.println("7");
                 String frmtrm_add_amount = document.select("list").get(i).select("frmtrm_add_amount").text().replace(",", "");
-                System.out.println("8");
 
 
                 company.setCorpcode(corpcode);
