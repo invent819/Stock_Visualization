@@ -41,12 +41,15 @@ public class Company {
     Long id;
     String stock_name;
     String corpcode;
+    String reprt_code; // 보고서 코드	1분기보고서 : 11013 반기보고서 : 11012 3분기보고서 : 11014 사업보고서 : 11011
     int bsns_year;
     String account_nm; // 계정명	ex) 자본총계
     String fs_div; // 개별/연결구분
-    String sj_nm;
-    int thstrm_amount; // 당기금액
-    int frmtrm_amount; // 전기금액
+    String sj_nm; // 재무제표명	ex) 재무상태표 또는 손익계산서 출력
+    Long thstrm_amount; // 당기금액
+    Long thstrm_add_amount; // 당기누적금액	9,999,999,999
+    Long frmtrm_amount; // 전기금액
+    Long frmtrm_add_amount; // 전기누적금액	9,999,999,999
     String induty_code; // 산업코드
     public Company(){
 
