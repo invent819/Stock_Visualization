@@ -19,11 +19,11 @@ public class JdbcCompanyRepository implements CompanyRepository {
 
     @Override
     public Company save(Company company){
-        String sql = "insert into company(id, stock_name, corpcode, bsns_year, account_nm, fs_div, sj_nm, thstrm_amount, frmtrm_amount, induty_code)" +
-                " values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        jdbcTemplate.update(sql, company.getId(), company.getStock_name(), company.getCorpcode(),
+        String sql = "insert into company(id, stock_name, corp_code, reprt_code, bsns_year, account_nm, fs_div, sj_nm, thstrm_amount, thstrm_add_amount, frmtrm_amount, frmtrm_add_amount, induty_code)" +
+                " values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        jdbcTemplate.update(sql, company.getId(), company.getStock_name(), company.getCorpcode(), company.getReprt_code(),
                 company.getBsns_year(), company.getAccount_nm(), company.getFs_div(), company.getSj_nm(),
-                company.getThstrm_amount(), company.getFrmtrm_amount(), company.getInduty_code());
+                company.getThstrm_amount(), company.getThstrm_add_amount(), company.getFrmtrm_amount(), company.getFrmtrm_add_amount(), company.getInduty_code());
 /*        company.setId(++sequence);
         store.put(company.getId(), company);*/
         return company;
