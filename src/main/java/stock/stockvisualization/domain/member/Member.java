@@ -2,19 +2,19 @@ package stock.stockvisualization.domain.member;
 
 import lombok.Data;
 import stock.stockvisualization.domain.company.Company;
+import stock.stockvisualization.domain.company.CompanyFinancialInfo;
 
-import javax.validation.constraints.NotEmpty;
-import java.util.List;
+import java.util.LinkedHashSet;
 
 @Data
 public class Member {
-    private Long id;
+    private Long memberId;
 
-    private String name;
+    private String userName;
 
     private String loginId;
-    private String password;
+    private String userPassword;
 
-    private List<Company> companies;
+    private LinkedHashSet<Company> companies;
 
 }

@@ -4,15 +4,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.simple.parser.ParseException;
 import org.jsoup.Jsoup;
-import org.jsoup.nodes.DataNode;
 import org.jsoup.nodes.Document;
-import org.jsoup.select.Elements;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.xml.sax.SAXException;
 import stock.stockvisualization.domain.member.Member;
-import stock.stockvisualization.domain.member.MemberRepository;
+import stock.stockvisualization.domain.member.JdbcMemberRepository;
 import stock.stockvisualization.web.SessionConst;
 import stock.stockvisualization.web.company.CompanyForm;
 import stock.stockvisualization.web.company.CompanyService;
@@ -29,7 +27,7 @@ import java.util.*;
 @Slf4j
 @RequiredArgsConstructor
 public class SeleniumController {
-    private final MemberRepository memberRepository;
+    private final JdbcMemberRepository memberRepository;
     private final SeleniumService seleniumTest;
     private final CompanyService companyService;
     @ModelAttribute("likeCompanies")
@@ -70,11 +68,12 @@ public class SeleniumController {
 
         Member member1 = new Member();
         member1.setLoginId("test");
-        member1.setPassword("test");
-        member1.setCompanies(new ArrayList<>());
+        member1.setUserPassword("test");
         memberRepository.save(member1);
-
+        //companyService.addIndustryCode();
         seleniumTest.saveCrawlingData();
+
+
         //jsoupTest();
         //Company find_company = seleniumTest.setCompany("삼성전자", "2022", "11013");
 
