@@ -58,14 +58,15 @@ public class CompanyService {
                             name = cell.getStringCellValue();
                             flag=0;
                         }
-//                        System.out.print(cell.getStringCellValue() + "\t");
+                        System.out.print(cell.getStringCellValue() + "\t");
             }
             industry_code.put(code, name);
 
-//            System.out.println("industry_code = " + industry_code);
-//            System.out.println("industry_code = " + industry_code.size());
+/*            System.out.println("industry_code = " + industry_code);
+            System.out.println("industry_code = " + industry_code.size());*/
         }
         file.close();
+
 
     }
 }

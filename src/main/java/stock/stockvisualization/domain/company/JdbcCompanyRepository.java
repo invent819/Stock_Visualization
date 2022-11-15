@@ -1,31 +1,30 @@
 package stock.stockvisualization.domain.company;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.core.namedparam.SqlParameterSource;
+import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
-@Slf4j
+import javax.sql.DataSource;
+import java.util.List;
 @Repository
-@RequiredArgsConstructor
-public class JdbcCompanyRepository implements CompanyRepository {
-    //사용자가 관심 있는 company 저장소
-    private static Map<Long, Company> store = new ConcurrentHashMap<>();
-    private final JdbcTemplate jdbcTemplate;
-    private static Long sequence = 0L;
+public class JdbcCompanyRepository implements CompanyRepository{
+    private final NamedParameterJdbcTemplate template;
+    private final SimpleJdbcInsert jdbcInsert;
+
+    public JdbcCompanyRepository(DataSource dataSource) {
+        this.template = new NamedParameterJdbcTemplate(dataSource);
+        this.jdbcInsert = new SimpleJdbcInsert(dataSource)
+                .withTableName("company")
+                .usingGeneratedKeyColumns("company_id");
+    }
 
     @Override
-    public Company save(Company company){
-        String sql = "insert into company(id, stock_name, corp_code, reprt_code, bsns_year, account_nm, fs_div, sj_nm, thstrm_amount, thstrm_add_amount, frmtrm_amount, frmtrm_add_amount, induty_code)" +
-                " values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        jdbcTemplate.update(sql, company.getId(), company.getStock_name(), company.getCorpcode(), company.getReprt_code(),
-                company.getBsns_year(), company.getAccount_nm(), company.getFs_div(), company.getSj_nm(),
-                company.getThstrm_amount(), company.getThstrm_add_amount(), company.getFrmtrm_amount(), company.getFrmtrm_add_amount(), company.getInduty_code());
-/*        company.setId(++sequence);
-        store.put(company.getId(), company);*/
+    public Company save(Company company) {
+        SqlParameterSource param = new BeanPropertySqlParameterSource(company);
+        Number key = jdbcInsert.executeAndReturnKey(param);
+        company.setCompanyId(key.longValue());
         return company;
     }
 
@@ -40,9 +39,12 @@ public class JdbcCompanyRepository implements CompanyRepository {
     }
 
     @Override
+    public List<Company> findAll(Company companyCond) {
+        return null;
+    }
+
+    @Override
     public void deleteById(Long id) {
 
     }
-
-
 }

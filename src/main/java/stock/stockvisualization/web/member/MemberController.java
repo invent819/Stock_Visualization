@@ -10,9 +10,8 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import stock.stockvisualization.web.SessionConst;
-import stock.stockvisualization.web.login.LoginForm;
 import stock.stockvisualization.domain.member.Member;
-import stock.stockvisualization.domain.member.MemberRepository;
+import stock.stockvisualization.domain.member.JdbcMemberRepository;
 import stock.stockvisualization.domain.member.MemberSaveForm;
 
 import javax.servlet.http.HttpServletRequest;
@@ -23,7 +22,7 @@ import javax.servlet.http.HttpSession;
 @RequestMapping("/members")
 @RequiredArgsConstructor
 public class MemberController {
-    private final MemberRepository memberRepository;
+    private final JdbcMemberRepository memberRepository;
     @GetMapping("/add")
     public String addFrom(@ModelAttribute("member") MemberSaveForm member){
         return "members/addMemberForm";
@@ -36,8 +35,8 @@ public class MemberController {
         }
         Member savedMember = new Member();
         savedMember.setLoginId(member.getLoginId());
-        savedMember.setName(member.getName());
-        savedMember.setPassword(member.getPassword());
+        savedMember.setUserName(member.getName());
+        savedMember.setUserPassword(member.getPassword());
         memberRepository.save(savedMember);
         HttpSession session = request.getSession();
         session.setAttribute(SessionConst.LOGIN_MEMBER, savedMember);

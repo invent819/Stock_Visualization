@@ -7,8 +7,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.xml.sax.SAXException;
-import stock.stockvisualization.web.selenium.SeleniumService;
 import stock.stockvisualization.domain.company.Company;
+import stock.stockvisualization.web.selenium.SeleniumService;
+import stock.stockvisualization.domain.company.CompanyFinancialInfo;
 import stock.stockvisualization.domain.member.Member;
 import stock.stockvisualization.web.SessionConst;
 
@@ -18,6 +19,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.util.HashMap;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -44,8 +46,7 @@ public class CompanyController {
         // 전체 가져오려면 SeleniumService.xmlFindCode() 파라미터 조건없이 가져오도록 수정해야함
         //seleniumService.setAllCompany();
         seleniumService.saveCrawlingData();
-        HashMap<String, Company> companies = SeleniumService.companies;
-        model.addAttribute("companies", companies.values());
+        //model.addAttribute("companies", companies.values());
         return "companies/companyList";
     }
 
@@ -53,7 +54,7 @@ public class CompanyController {
     @GetMapping("/add")
     public String getCompany(
             HttpServletRequest request,
-            @ModelAttribute Company company, Model model) {
+            @ModelAttribute CompanyFinancialInfo company, Model model) {
 
         //세션이 없으면 index
         HttpSession session = request.getSession(false);
@@ -78,7 +79,7 @@ public class CompanyController {
         HttpSession session = request.getSession();
         Member member = (Member) session.getAttribute(SessionConst.LOGIN_MEMBER);
         System.out.println("addMember = " + addMember);
-        List<Company> companies = member.getCompanies();
+        HashSet<Company> companies = member.getCompanies();
         System.out.println("member = " + member);
         return "";
     }

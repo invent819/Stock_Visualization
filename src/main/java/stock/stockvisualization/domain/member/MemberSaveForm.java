@@ -1,11 +1,8 @@
 package stock.stockvisualization.domain.member;
 
 import lombok.Data;
-import stock.stockvisualization.domain.company.Company;
 
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
-import java.util.List;
 
 @Data
 public class MemberSaveForm {
