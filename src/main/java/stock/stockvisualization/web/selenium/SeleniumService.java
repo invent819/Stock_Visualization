@@ -13,10 +13,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
-import stock.stockvisualization.domain.company.Company;
-import stock.stockvisualization.domain.company.CompanyFinancialInfo;
-import stock.stockvisualization.domain.company.CompanyFinancialInfoRepository;
-import stock.stockvisualization.domain.company.CompanyRepository;
+import stock.stockvisualization.domain.company.*;
 import stock.stockvisualization.web.company.CompanyService;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -32,7 +29,6 @@ import java.util.concurrent.TimeUnit;
 @Data
 @Slf4j
 public class SeleniumService {
-    // stock_name, corpcode, bsns_year, account_nm, fs_div, sj_nm, thstrm_amount, frmtrm_amount, induty_code
     private  WebDriver driver;
     private final String API_KEY = "12ed28c5a1ccad901a74e01b506d6690588f73f5";
     private final String COMPANY_INFO_URL = "https://opendart.fss.or.kr/api/company.xml";
@@ -65,8 +61,7 @@ public class SeleniumService {
         Elements stock_name = document.select("stock_name");
         String induty_code = document.select("induty_code").text();
 
-        company.setStock_name(stock_name.text());
-        company.setInduty_code(induty_code.substring(0, 3));
+
         return induty_code.substring(0, 3);
     }
 
@@ -105,7 +100,7 @@ public class SeleniumService {
 
         // xml 파싱 빌드업
         int cnt=0;
-
+        int parsingCnt=0;
         try {
             File file = new File("src/main/resources/corpCode/CORPCODE.xml");
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -114,7 +109,7 @@ public class SeleniumService {
             document.getDocumentElement().normalize();
             NodeList nList = document.getElementsByTagName("list");
 
-            for (int temp = 91100; temp > 0; temp--, cnt++) { //546  nList.getLength()
+            for (int temp = 4563; temp < nList.getLength(); temp++, cnt++) {// 4563
                 System.out.println("temp = " + temp);
 
                 // 크롤링 속도 조절
@@ -159,12 +154,19 @@ public class SeleniumService {
 
 
     private void insertCompanyFinancialInfo(String stock_name, String corp_code, String bsns_year, String reprt_code, org.jsoup.nodes.Document document) throws IOException {
+        Company company = new Company();
+        company.setCorpCode(corp_code);
+        company.setStockName(stock_name);
+        companyRepository.save(company);
+
+
         int size = document.select("list").size();
         String induty_code = null;
+        String stock_code = null;
         for(int i =0; i < size; i++){
-            CompanyFinancialInfo companyFinancialInfo = new CompanyFinancialInfo(stock_name, corp_code);
+            CompanyFinancialInfo companyFinancialInfo = new CompanyFinancialInfo();
             try {
-                String corpcode = document.select("list").get(i).select("corp_code").text();
+                stock_code = document.select("list").get(i).select("stock_code").text();
                 String account_nm = document.select("list").get(i).select("account_nm").text();
                 String fs_div = document.select("list").get(i).select("fs_div").text();
                 String sj_nm = document.select("list").get(i).select("sj_nm").text();
@@ -174,26 +176,27 @@ public class SeleniumService {
                 String frmtrm_add_amount = document.select("list").get(i).select("frmtrm_add_amount").text().replace(",", "");
 
 
-                companyFinancialInfo.setCorp_code(corpcode);
-                companyFinancialInfo.setReprt_code(reprt_code);
-                companyFinancialInfo.setBsns_year(Integer.parseInt(bsns_year));
-                companyFinancialInfo.setSj_nm(sj_nm);
-                companyFinancialInfo.setAccount_nm(account_nm);
-                companyFinancialInfo.setFs_div(fs_div);
+
+                companyFinancialInfo.setReprtCode(reprt_code);
+                companyFinancialInfo.setBsnsYear(Integer.parseInt(bsns_year));
+                companyFinancialInfo.setSjNm(sj_nm);
+                companyFinancialInfo.setAccountNm(account_nm);
+                companyFinancialInfo.setFsDiv(fs_div);
+                companyFinancialInfo.setCompanyId(company.getCompanyId());
                 if (thstrm_amount.equals(""))
-                    companyFinancialInfo.setThstrm_amount(null);
-                else companyFinancialInfo.setThstrm_amount(Long.parseLong(thstrm_amount));
+                    companyFinancialInfo.setThstrmAmount(null);
+                else companyFinancialInfo.setThstrmAmount(Long.parseLong(thstrm_amount));
                 if (thstrm_add_amount.equals(""))
-                    companyFinancialInfo.setThstrm_add_amount(null);
-                else companyFinancialInfo.setThstrm_add_amount(Long.parseLong(thstrm_add_amount));
+                    companyFinancialInfo.setThstrmAddAmount(null);
+                else companyFinancialInfo.setThstrmAddAmount(Long.parseLong(thstrm_add_amount));
                 if(frmtrm_amount.equals("")||frmtrm_amount.equals("-"))
-                    companyFinancialInfo.setFrmtrm_amount(null);
-                else companyFinancialInfo.setFrmtrm_amount(Long.parseLong(frmtrm_amount));
+                    companyFinancialInfo.setFrmtrmAmount(null);
+                else companyFinancialInfo.setFrmtrmAmount(Long.parseLong(frmtrm_amount));
                 if (frmtrm_add_amount.equals("")||frmtrm_add_amount.equals("-")) {
-                    companyFinancialInfo.setFrmtrm_add_amount(null);
+                    companyFinancialInfo.setFrmtrmAddAmount(null);
                 }
                 else
-                    companyFinancialInfo.setFrmtrm_add_amount(Long.parseLong(frmtrm_add_amount));
+                    companyFinancialInfo.setFrmtrmAddAmount(Long.parseLong(frmtrm_add_amount));
 
                 induty_code = findCompanyInfo(companyFinancialInfo, corp_code);
                 companyFinancialInfoRepository.save(companyFinancialInfo);
@@ -202,16 +205,17 @@ public class SeleniumService {
             {
                 log.info(e.getMessage());
             }
-
         }
-        Company company = new Company();
-        company.setCorp_code(corp_code);
-        company.setStock_name(stock_name);
-        company.setInduty_code(induty_code);
+
         Map<String, String> industry_code = companyService.getIndustry_code();
         String description = industry_code.get(induty_code);
-        company.setDescription(description);
-        companyRepository.save(company);
+        Long marketCap = companyService.getMarketCap(stock_code);
+        CompanyUpdateDto companyUpdateDto = new CompanyUpdateDto();
+        companyUpdateDto.setStockCode(stock_code);
+        companyUpdateDto.setIndutyCode(induty_code.substring(0,2));
+        companyUpdateDto.setIndutyDescription(description);
+        companyUpdateDto.setMarketCap(marketCap);
+        companyRepository.update(company.getCompanyId(), companyUpdateDto);
 
     }
 }

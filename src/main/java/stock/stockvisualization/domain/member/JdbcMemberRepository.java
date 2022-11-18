@@ -25,7 +25,7 @@ public class JdbcMemberRepository implements MemberRepository {
         this.template = new NamedParameterJdbcTemplate(dataSource);
         this.jdbcInsert = new SimpleJdbcInsert(dataSource)
                 .withTableName("member")
-                .usingGeneratedKeyColumns("id");
+                .usingGeneratedKeyColumns("member_id");
     }
 
     @Override

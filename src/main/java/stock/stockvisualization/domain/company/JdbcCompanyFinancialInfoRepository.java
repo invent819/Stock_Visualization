@@ -38,9 +38,13 @@ public class JdbcCompanyFinancialInfoRepository implements CompanyFinancialInfoR
     }
 
     @Override
-    public CompanyFinancialInfo findById(Long id) {
+    public CompanyFinancialInfo findByCompanyId(Long id) {
+/*        String sql = ""*//**//*
+        template.query(sql)*/
         return null;
     }
+
+
 
     @Override
     public void deleteById(Long id) {
