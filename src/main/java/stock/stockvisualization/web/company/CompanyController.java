@@ -1,5 +1,6 @@
 package stock.stockvisualization.web.company;
 
+import com.beust.jcommander.IParameterizedParser;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.simple.parser.ParseException;
@@ -8,6 +9,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.xml.sax.SAXException;
 import stock.stockvisualization.domain.company.Company;
+import stock.stockvisualization.domain.company.CompanyRepository;
 import stock.stockvisualization.web.selenium.SeleniumService;
 import stock.stockvisualization.domain.company.CompanyFinancialInfo;
 import stock.stockvisualization.domain.member.Member;
@@ -28,6 +30,7 @@ import java.util.Map;
 @RequestMapping("/companies")
 @RequiredArgsConstructor
 public class CompanyController {
+    private final CompanyRepository companyRepository;
     private final SeleniumService seleniumService;
 
     @ModelAttribute("likeCompanies")
@@ -41,15 +44,17 @@ public class CompanyController {
     }
 
     @GetMapping
-    public String Companies(Model model) throws ParserConfigurationException, IOException, ParseException, SAXException {
-        // 전체 회사를 가져오는게 아님.
-        // 전체 가져오려면 SeleniumService.xmlFindCode() 파라미터 조건없이 가져오도록 수정해야함
-        //seleniumService.setAllCompany();
-        seleniumService.saveCrawlingData();
-        //model.addAttribute("companies", companies.values());
-        return "companies/companyList";
+    @ResponseBody
+    public List<Company> Companies() {
+        List<Company> companyList = companyRepository.findAll(new Company());
+        return companyList;
     }
+    @GetMapping("/companyFinancialInfo")
+    @ResponseBody
+    public List<CompanyFinancialInfo> companyFinancialInfo(@RequestParam Company companyCond){
 
+        return null;
+    }
 
     @GetMapping("/add")
     public String getCompany(

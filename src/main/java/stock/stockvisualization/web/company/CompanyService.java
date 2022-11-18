@@ -8,10 +8,8 @@ import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.*;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -58,7 +56,7 @@ public class CompanyService {
                             name = cell.getStringCellValue();
                             flag=0;
                         }
-                        System.out.print(cell.getStringCellValue() + "\t");
+                        //System.out.print(cell.getStringCellValue() + "\t");
             }
             industry_code.put(code, name);
 
@@ -68,5 +66,37 @@ public class CompanyService {
         file.close();
 
 
+    }
+
+    public Long getMarketCap(String stockCode) {
+        BufferedReader br = null;
+        String line;
+        String path = "src/main/resources/stockInfo/korea_2022-11-19.csv";
+        try {
+            br = new BufferedReader(new InputStreamReader(new FileInputStream(path), "UTF-8"));
+            //br = new BufferedReader(new FileReader(path)); // 이렇게도 가능
+            while((line = br.readLine()) != null) {
+                //String[] temp = line.split("\t"); // 탭으로 구분
+                String[] temp = line.split(","); // 쉼표로 구분
+                if (temp[0].equals(stockCode)) {
+                    for (int i = 0; i < temp.length; i++) {
+                        if (i==9) {
+                            if(temp[8].contains(".")) {
+                                String[] splitData = temp[8].split("[.]");
+                                return Long.parseLong(splitData[0]);
+                            }
+                            else{
+                                return Long.parseLong(temp[8]);
+                            }
+                        }
+
+                    }
+                }
+            }
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return null;
     }
 }

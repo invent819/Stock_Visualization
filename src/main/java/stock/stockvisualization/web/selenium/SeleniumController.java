@@ -19,7 +19,10 @@ import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.xml.parsers.ParserConfigurationException;
+import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.*;
 
 
@@ -70,6 +73,9 @@ public class SeleniumController {
         member1.setLoginId("test");
         member1.setUserPassword("test");
         memberRepository.save(member1);
+
+
+
         //companyService.addIndustryCode();
         seleniumTest.saveCrawlingData();
 
@@ -89,6 +95,8 @@ public class SeleniumController {
 
 
     }
+
+
 
     public void jsoupTest() throws IOException, ParseException {//
         String url = "https://opendart.fss.or.kr/api/fnlttSinglAcnt.xml?crtfc_key=12ed28c5a1ccad901a74e01b506d6690588f73f5&corp_code=00266961&bsns_year=2022&reprt_code=11012";
