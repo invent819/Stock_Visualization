@@ -14,6 +14,8 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 import stock.stockvisualization.domain.company.*;
+import stock.stockvisualization.domain.induty.Induty;
+import stock.stockvisualization.domain.induty.JdbcIndutyRepository;
 import stock.stockvisualization.web.company.CompanyService;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -21,8 +23,8 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -38,11 +40,15 @@ public class SeleniumService {
     @Autowired
     private final CompanyRepository companyRepository;
 
+    @Autowired
+    private final JdbcIndutyRepository indutyRepository;
+
     private final CompanyService companyService;
 
-    public SeleniumService(CompanyFinancialInfoRepository companyFinancialInfoRepository, CompanyRepository companyRepository, CompanyService companyService){
+    public SeleniumService(CompanyFinancialInfoRepository companyFinancialInfoRepository, CompanyRepository companyRepository, JdbcIndutyRepository indutyRepository, CompanyService companyService){
         this.companyFinancialInfoRepository = companyFinancialInfoRepository;
         this.companyRepository = companyRepository;
+        this.indutyRepository = indutyRepository;
         this.companyService = companyService;
     }
 
@@ -109,7 +115,7 @@ public class SeleniumService {
             document.getDocumentElement().normalize();
             NodeList nList = document.getElementsByTagName("list");
 
-            for (int temp = 4563; temp < nList.getLength(); temp++, cnt++) {// 4563
+            for (int temp = 14392; temp < nList.getLength(); temp++, cnt++) {// 14392
                 System.out.println("temp = " + temp);
 
                 // 크롤링 속도 조절
@@ -157,6 +163,7 @@ public class SeleniumService {
         Company company = new Company();
         company.setCorpCode(corp_code);
         company.setStockName(stock_name);
+        company.setIndutyId(22);
         companyRepository.save(company);
 
 
@@ -212,10 +219,67 @@ public class SeleniumService {
         Long marketCap = companyService.getMarketCap(stock_code);
         CompanyUpdateDto companyUpdateDto = new CompanyUpdateDto();
         companyUpdateDto.setStockCode(stock_code);
-        companyUpdateDto.setIndutyCode(induty_code.substring(0,2));
+        String refactorIndutyCode = refactorIndutyCode(induty_code.substring(0, 2));
+
+        Optional<Induty> induty = indutyRepository.findByIndutyCode(refactorIndutyCode);
+        int induty_id;
+        if (induty.isEmpty())
+            induty_id = 22;
+        else
+            induty_id =induty.get().getIndutyId();
+        // induty table -> induty_id 참조
+        companyUpdateDto.setIndutyId(induty_id);
         companyUpdateDto.setIndutyDescription(description);
         companyUpdateDto.setMarketCap(marketCap);
         companyRepository.update(company.getCompanyId(), companyUpdateDto);
+
+    }
+
+    private String refactorIndutyCode(String indutyCode){
+        int intIndutyCode = Integer.parseInt(indutyCode);
+        if(intIndutyCode<4)
+            return "01";
+        else if(intIndutyCode<9)
+            return "05";
+        else if(intIndutyCode<35)
+            return "10";
+        else if(intIndutyCode==35)
+            return "35";
+        else if (intIndutyCode<40)
+            return "36";
+        else if(intIndutyCode<43)
+            return "41";
+        else if (intIndutyCode<48)
+            return "45";
+        else if(intIndutyCode<53)
+            return "49";
+        else if (intIndutyCode<57)
+            return "55";
+        else if(intIndutyCode<64)
+            return "58";
+        else if (intIndutyCode<67)
+            return "64";
+        else if(intIndutyCode==68)
+            return "68";
+        else if (intIndutyCode<74)
+            return "70";
+        else if(intIndutyCode<77)
+            return "74";
+        else if (intIndutyCode==84)
+            return "84";
+        else if(intIndutyCode==85)
+            return "85";
+        else if (intIndutyCode<88)
+            return "86";
+        else if(intIndutyCode<92)
+            return "90";
+        else if (intIndutyCode<97)
+            return "94";
+        else if(intIndutyCode==97)
+            return "97";
+        else if(intIndutyCode==99)
+            return "99";
+        return null;
 
     }
 }

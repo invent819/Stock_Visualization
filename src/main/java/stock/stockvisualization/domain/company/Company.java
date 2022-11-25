@@ -9,7 +9,8 @@ public class Company {
     String stockName;
     String corpCode;
     String description;
-    String indutyCode; // 산업코드
+    int indutyId; // 산업코드
     String indutyDescription; // 산업 설명
     Long marketCap; //시가총액
+    int searchCnt;
 }

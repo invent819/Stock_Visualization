@@ -15,6 +15,5 @@ public class Member {
     private String loginId;
     private String userPassword;
 
-    private LinkedHashSet<Company> companies;
 
 }
