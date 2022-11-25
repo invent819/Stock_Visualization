@@ -38,11 +38,11 @@ public class JdbcCompanyRepository implements CompanyRepository{
     @Override
     public void update(Long companyId, CompanyUpdateDto updateParam) {
         String sql = "update company " +
-                "set stock_code=:stockCode, induty_code=:indutyCode, induty_description=:indutyDescription, market_cap=:marketCap " +
+                "set stock_code=:stockCode, induty_id=:indutyId, induty_description=:indutyDescription, market_cap=:marketCap " +
                 "where company_id=" + String.valueOf(companyId);
         SqlParameterSource param = new MapSqlParameterSource()
                 .addValue("stockCode", updateParam.getStockCode())
-                .addValue("indutyCode", updateParam.getIndutyCode())
+                .addValue("indutyId", updateParam.getIndutyId())
                 .addValue("indutyDescription", updateParam.getIndutyDescription())
                 .addValue("marketCap", updateParam.getMarketCap());
         template.update(sql, param);

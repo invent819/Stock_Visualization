@@ -84,7 +84,7 @@ public class CompanyController {
         HttpSession session = request.getSession();
         Member member = (Member) session.getAttribute(SessionConst.LOGIN_MEMBER);
         System.out.println("addMember = " + addMember);
-        HashSet<Company> companies = member.getCompanies();
+        //HashSet<Company> companies = member.getCompanies();
         System.out.println("member = " + member);
         return "";
     }
