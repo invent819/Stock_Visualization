@@ -115,11 +115,11 @@ public class SeleniumService {
             document.getDocumentElement().normalize();
             NodeList nList = document.getElementsByTagName("list");
 
-            for (int temp = 14392; temp < nList.getLength(); temp++, cnt++) {// 14392
+            for (int temp = 95677; temp < nList.getLength(); temp++, cnt++) {// 35808 // 14392
                 System.out.println("temp = " + temp);
 
                 // 크롤링 속도 조절
-                if (cnt>350){
+                if (cnt>100){
                     log.error("70초 딜레이 중");
                     TimeUnit.SECONDS.sleep(70);
                     cnt=0;
@@ -160,6 +160,11 @@ public class SeleniumService {
 
 
     private void insertCompanyFinancialInfo(String stock_name, String corp_code, String bsns_year, String reprt_code, org.jsoup.nodes.Document document) throws IOException {
+        try {
+            TimeUnit.MILLISECONDS.sleep(500);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
         Company company = new Company();
         company.setCorpCode(corp_code);
         company.setStockName(stock_name);
@@ -190,10 +195,10 @@ public class SeleniumService {
                 companyFinancialInfo.setAccountNm(account_nm);
                 companyFinancialInfo.setFsDiv(fs_div);
                 companyFinancialInfo.setCompanyId(company.getCompanyId());
-                if (thstrm_amount.equals(""))
+                if (thstrm_amount.equals("")||thstrm_amount.equals("-"))
                     companyFinancialInfo.setThstrmAmount(null);
                 else companyFinancialInfo.setThstrmAmount(Long.parseLong(thstrm_amount));
-                if (thstrm_add_amount.equals(""))
+                if (thstrm_add_amount.equals("")||thstrm_add_amount.equals("-"))
                     companyFinancialInfo.setThstrmAddAmount(null);
                 else companyFinancialInfo.setThstrmAddAmount(Long.parseLong(thstrm_add_amount));
                 if(frmtrm_amount.equals("")||frmtrm_amount.equals("-"))
@@ -232,7 +237,6 @@ public class SeleniumService {
         companyUpdateDto.setIndutyDescription(description);
         companyUpdateDto.setMarketCap(marketCap);
         companyRepository.update(company.getCompanyId(), companyUpdateDto);
-
     }
 
     private String refactorIndutyCode(String indutyCode){
@@ -283,3 +287,19 @@ public class SeleniumService {
 
     }
 }
+
+
+/*
+select * from induty;
+select * from company where company_id >2000;
+select * from companyfinancialinfo;
+select * from member;
+
+insert into company(company_id, induty_id) values(1, 1);
+insert into company(company_id, stock_code) values(3, 1);
+update company set induty_id = 1 where company_id = 2;
+
+select * from induty where induty_code = "01";
+delete from company where company_id = 1732;
+
+ */
